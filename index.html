@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-  <title>My 3D Cat</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <title>My Cat Life</title>
 
   <style>
+
     * {
       box-sizing: border-box;
     }
@@ -15,7 +20,7 @@
       margin: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
-      background: #111;
+      background: #9bd8ff;
       touch-action: none;
     }
 
@@ -23,27 +28,161 @@
       display: block;
     }
 
-    /* Game information */
-    #info {
+    /* ---------- SCREENS ---------- */
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 244, 224, 0.96);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .screen.hidden {
+      display: none;
+    }
+
+    .title {
+      font-size: 32px;
+      margin: 5px 0 8px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 0 0 18px;
+      color: #555;
+    }
+
+    /* ---------- ADOPTION ---------- */
+
+    #catsList {
+      width: min(900px, 100%);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      max-height: 55vh;
+      overflow-y: auto;
+      padding: 5px;
+    }
+
+    .catCard {
+      background: white;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      cursor: pointer;
+      border: 3px solid transparent;
+    }
+
+    .catCard.selected {
+      border-color: #ff9f43;
+    }
+
+    .catEmoji {
+      font-size: 55px;
+      margin-bottom: 5px;
+    }
+
+    .catCard h3 {
+      margin: 4px 0;
+    }
+
+    .catCard p {
+      margin: 4px 0;
+      font-size: 13px;
+      color: #555;
+    }
+
+    #catDetails {
+      background: white;
+      border-radius: 18px;
+      padding: 15px;
+      width: min(450px, 95%);
+      margin-top: 14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    #catDetails.hidden {
+      display: none;
+    }
+
+    #nameInput {
+      width: 90%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 12px;
+      font-size: 16px;
+      margin: 8px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+
+    button {
+      border: none;
+      border-radius: 15px;
+      padding: 12px 17px;
+      font-size: 15px;
+      font-weight: bold;
+      background: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+      cursor: pointer;
+      margin: 4px;
+    }
+
+    button:active {
+      transform: scale(0.93);
+    }
+
+    .mainButton {
+      background: #ffb347;
+      color: white;
+    }
+
+    .greenButton {
+      background: #76c893;
+      color: white;
+    }
+
+    .blueButton {
+      background: #6fa8dc;
+      color: white;
+    }
+
+    .pinkButton {
+      background: #e88ac7;
+      color: white;
+    }
+
+    /* ---------- HUD ---------- */
+
+    #hud {
       position: absolute;
       top: 15px;
       left: 15px;
       z-index: 10;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.92);
       padding: 12px;
       border-radius: 15px;
-      width: 190px;
+      width: 205px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     }
 
-    #info h1 {
-      margin: 0 0 8px;
-      font-size: 20px;
+    #hud h2 {
+      margin: 0 0 7px;
+      font-size: 19px;
     }
 
     .stat {
-      margin: 5px 0;
-      font-size: 14px;
+      margin: 6px 0;
+      font-size: 13px;
     }
 
     .bar {
@@ -51,6 +190,7 @@
       background: #ddd;
       border-radius: 10px;
       overflow: hidden;
+      margin-top: 3px;
     }
 
     .fill {
@@ -60,45 +200,35 @@
       transition: width 0.3s;
     }
 
-    /* Buttons */
-    #buttons {
+    /* ---------- TOP MENU ---------- */
+
+    #topMenu {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 230px;
+    }
+
+    /* ---------- ACTION BUTTONS ---------- */
+
+    #actions {
       position: absolute;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
       display: flex;
-      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      width: 100%;
     }
 
-    button {
-      border: none;
-      border-radius: 15px;
-      padding: 13px 17px;
-      font-size: 15px;
-      font-weight: bold;
-      background: white;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
+    /* ---------- MOVEMENT ---------- */
 
-    button:active {
-      transform: scale(0.92);
-    }
-
-    #message {
-      position: absolute;
-      top: 145px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      background: rgba(255,255,255,0.92);
-      padding: 10px 18px;
-      border-radius: 20px;
-      font-weight: bold;
-      display: none;
-    }
-
-    /* Movement controls */
     #controls {
       position: absolute;
       bottom: 105px;
@@ -114,6 +244,7 @@
       height: 48px;
       padding: 0;
       font-size: 22px;
+      margin: 0;
     }
 
     #up {
@@ -135,13 +266,178 @@
       top: 46px;
       right: 0;
     }
+
+    /* ---------- MESSAGE ---------- */
+
+    #message {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 15;
+      background: rgba(255,255,255,0.94);
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-weight: bold;
+      display: none;
+      text-align: center;
+    }
+
+    /* ---------- TRAINING ---------- */
+
+    #trainingScreen {
+      justify-content: flex-start;
+      padding-top: 35px;
+    }
+
+    #trainingList {
+      width: min(700px, 100%);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .trainingCard {
+      background: white;
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .trainingProgress {
+      height: 12px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 8px 0;
+    }
+
+    .trainingProgress div {
+      height: 100%;
+      background: #76c893;
+      width: 0%;
+    }
+
+    /* ---------- CAT INFO ---------- */
+
+    #homeCats {
+      margin-top: 6px;
+      font-size: 12px;
+    }
+
   </style>
 </head>
 
 <body>
 
-  <div id="info">
-    <h1>🐱 My Cat</h1>
+  <!-- ================= ADOPTION SCREEN ================= -->
+
+  <div id="adoptionScreen" class="screen">
+
+    <div class="title">🏪 Cat Adoption Centre</div>
+
+    <p class="subtitle">
+      Choose a cat you'd like to adopt!
+    </p>
+
+    <div id="catsList"></div>
+
+    <div id="catDetails" class="hidden">
+
+      <div id="selectedCatEmoji" class="catEmoji">🐱</div>
+
+      <h2 id="selectedCatName">Cat</h2>
+
+      <p>
+        <b>Species:</b>
+        <span id="selectedSpecies"></span>
+      </p>
+
+      <p>
+        <b>Breed:</b>
+        <span id="selectedBreed"></span>
+      </p>
+
+      <p>
+        <b>Age:</b>
+        <span id="selectedAge"></span>
+      </p>
+
+      <p>
+        <b>Birthday:</b>
+        <span id="selectedBirthday"></span>
+      </p>
+
+      <p>
+        <b>Personality:</b>
+        <span id="selectedPersonality"></span>
+      </p>
+
+      <p>
+        <b>Special marking:</b>
+        <span id="selectedMarking"></span>
+      </p>
+
+      <input
+        id="nameInput"
+        type="text"
+        maxlength="18"
+        placeholder="Give your cat a name..."
+      >
+
+      <br>
+
+      <button
+        id="adoptButton"
+        class="mainButton"
+      >
+        🐾 Adopt This Cat
+      </button>
+
+    </div>
+
+    <button
+      id="backFromAdoption"
+      class="blueButton hidden"
+    >
+      🏠 Back Home
+    </button>
+
+  </div>
+
+
+  <!-- ================= TRAINING SCREEN ================= -->
+
+  <div id="trainingScreen" class="screen hidden">
+
+    <div class="title">🎓 Training Room</div>
+
+    <p class="subtitle">
+      Choose a trick and train your cat!
+    </p>
+
+    <div id="trainingCatName"></div>
+
+    <div id="trainingList"></div>
+
+    <br>
+
+    <button
+      id="trainingBack"
+      class="blueButton"
+    >
+      🏠 Back Home
+    </button>
+
+  </div>
+
+
+  <!-- ================= HUD ================= -->
+
+  <div id="hud" class="hidden">
+
+    <h2 id="hudCatName">🐱 My Cat</h2>
 
     <div class="stat">
       Hunger
@@ -163,96 +459,177 @@
         <div id="energy" class="fill"></div>
       </div>
     </div>
+
+    <div id="homeCats"></div>
+
   </div>
 
-  <div id="message"></div>
 
-  <div id="controls">
+  <!-- ================= TOP MENU ================= -->
+
+  <div id="topMenu" class="hidden">
+
+    <button id="adoptionButton">
+      🏪 Adoption
+    </button>
+
+    <button id="trainingButton">
+      🎓 Training
+    </button>
+
+  </div>
+
+
+  <!-- ================= ACTIONS ================= -->
+
+  <div id="actions" class="hidden">
+
+    <button id="feed">
+      🍗 Feed
+    </button>
+
+    <button id="play">
+      🧶 Play
+    </button>
+
+    <button id="pet">
+      ❤️ Pet
+    </button>
+
+    <button id="sleep" class="blueButton">
+      🛏️ Sleep
+    </button>
+
+  </div>
+
+
+  <!-- ================= MOVEMENT ================= -->
+
+  <div id="controls" class="hidden">
+
     <button class="move" id="up">▲</button>
     <button class="move" id="down">▼</button>
     <button class="move" id="left">◀</button>
     <button class="move" id="right">▶</button>
+
   </div>
 
-  <div id="buttons">
-    <button id="feed">🍗 Feed</button>
-    <button id="play">🧶 Play</button>
-    <button id="pet">❤️ Pet</button>
-  </div>
+
+  <div id="message"></div>
+
+
+  <!-- ================= THREE.JS ================= -->
 
   <script type="module">
 
     import * as THREE from
       "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
-    // -------------------------
-    // BASIC THREE.JS SETUP
-    // -------------------------
+
+    /* =========================================================
+       GAME SETUP
+    ========================================================= */
 
     const scene = new THREE.Scene();
 
-    scene.background = new THREE.Color(0x9bd8ff);
+    scene.background =
+      new THREE.Color(0x9bd8ff);
 
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
+
+    const camera =
+      new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+
+    camera.position.set(
+      0,
+      7,
+      11
     );
 
-    camera.position.set(0, 7, 11);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true
-    });
+    const renderer =
+      new THREE.WebGLRenderer({
+        antialias: true
+      });
+
 
     renderer.setSize(
       window.innerWidth,
       window.innerHeight
     );
 
+
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, 2)
+      Math.min(
+        window.devicePixelRatio,
+        2
+      )
     );
+
 
     renderer.shadowMap.enabled = true;
 
-    document.body.appendChild(renderer.domElement);
-
-
-    // -------------------------
-    // LIGHTING
-    // -------------------------
-
-    const ambientLight = new THREE.AmbientLight(
-      0xffffff,
-      2
+    document.body.appendChild(
+      renderer.domElement
     );
 
-    scene.add(ambientLight);
 
-    const sunlight = new THREE.DirectionalLight(
-      0xffffff,
-      2
+    /* =========================================================
+       LIGHTING
+    ========================================================= */
+
+    const ambientLight =
+      new THREE.AmbientLight(
+        0xffffff,
+        2
+      );
+
+    scene.add(
+      ambientLight
     );
 
-    sunlight.position.set(5, 10, 5);
+
+    const sunlight =
+      new THREE.DirectionalLight(
+        0xffffff,
+        2
+      );
+
+    sunlight.position.set(
+      5,
+      10,
+      5
+    );
+
     sunlight.castShadow = true;
 
-    scene.add(sunlight);
+    scene.add(
+      sunlight
+    );
 
 
-    // -------------------------
-    // ROOM
-    // -------------------------
+    /* =========================================================
+       ROOM
+    ========================================================= */
 
     const floorGeometry =
-      new THREE.BoxGeometry(20, 0.3, 20);
+      new THREE.BoxGeometry(
+        20,
+        0.3,
+        20
+      );
+
 
     const floorMaterial =
       new THREE.MeshStandardMaterial({
         color: 0xc99b6b
       });
+
 
     const floor =
       new THREE.Mesh(
@@ -260,13 +637,15 @@
         floorMaterial
       );
 
+
     floor.position.y = -0.15;
+
     floor.receiveShadow = true;
 
-    scene.add(floor);
+    scene.add(
+      floor
+    );
 
-
-    // Walls
 
     function createWall(
       x,
@@ -284,10 +663,12 @@
           depth
         );
 
+
       const material =
         new THREE.MeshStandardMaterial({
           color: 0xf4dfc1
         });
+
 
       const wall =
         new THREE.Mesh(
@@ -295,28 +676,69 @@
           material
         );
 
-      wall.position.set(x, y, z);
+
+      wall.position.set(
+        x,
+        y,
+        z
+      );
+
+
       wall.receiveShadow = true;
 
-      scene.add(wall);
+      scene.add(
+        wall
+      );
     }
 
-    createWall(0, 4, -10, 20, 8, 0.3);
-    createWall(-10, 4, 0, 0.3, 8, 20);
-    createWall(10, 4, 0, 0.3, 8, 20);
+
+    createWall(
+      0,
+      4,
+      -10,
+      20,
+      8,
+      0.3
+    );
 
 
-    // -------------------------
-    // RUG
-    // -------------------------
+    createWall(
+      -10,
+      4,
+      0,
+      0.3,
+      8,
+      20
+    );
+
+
+    createWall(
+      10,
+      4,
+      0,
+      0.3,
+      8,
+      20
+    );
+
+
+    /* =========================================================
+       RUG
+    ========================================================= */
 
     const rugGeometry =
-      new THREE.BoxGeometry(8, 0.08, 5);
+      new THREE.BoxGeometry(
+        8,
+        0.08,
+        5
+      );
+
 
     const rugMaterial =
       new THREE.MeshStandardMaterial({
         color: 0xd89acb
       });
+
 
     const rug =
       new THREE.Mesh(
@@ -324,229 +746,92 @@
         rugMaterial
       );
 
-    rug.position.set(0, 0.05, 0);
 
-    scene.add(rug);
-
-
-    // -------------------------
-    // CAT
-    // -------------------------
-
-    const cat = new THREE.Group();
-
-    cat.position.set(0, 0, 0);
-
-    scene.add(cat);
-
-
-    // Body
-
-    const bodyGeometry =
-      new THREE.SphereGeometry(
-        1.25,
-        32,
-        20
-      );
-
-    const catMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0xf2a65a
-      });
-
-    const body =
-      new THREE.Mesh(
-        bodyGeometry,
-        catMaterial
-      );
-
-    body.scale.set(
-      1,
-      0.85,
-      1.25
-    );
-
-    body.position.y = 1.25;
-    body.castShadow = true;
-
-    cat.add(body);
-
-
-    // Head
-
-    const headGeometry =
-      new THREE.SphereGeometry(
-        0.9,
-        32,
-        20
-      );
-
-    const head =
-      new THREE.Mesh(
-        headGeometry,
-        catMaterial
-      );
-
-    head.position.set(
+    rug.position.set(
       0,
-      2.3,
-      -0.85
+      0.05,
+      0
     );
 
-    head.castShadow = true;
 
-    cat.add(head);
-
-
-    // Ears
-
-    function createEar(x) {
-
-      const geometry =
-        new THREE.ConeGeometry(
-          0.35,
-          0.8,
-          4
-        );
-
-      const ear =
-        new THREE.Mesh(
-          geometry,
-          catMaterial
-        );
-
-      ear.position.set(
-        x,
-        3.05,
-        -0.85
-      );
-
-      ear.rotation.y = Math.PI / 4;
-
-      ear.castShadow = true;
-
-      cat.add(ear);
-    }
-
-    createEar(-0.55);
-    createEar(0.55);
+    scene.add(
+      rug
+    );
 
 
-    // Eyes
+    /* =========================================================
+       BED
+    ========================================================= */
 
-    const eyeMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x222222
-      });
-
-    function createEye(x) {
-
-      const geometry =
-        new THREE.SphereGeometry(
-          0.12,
-          16,
-          16
-        );
-
-      const eye =
-        new THREE.Mesh(
-          geometry,
-          eyeMaterial
-        );
-
-      eye.position.set(
-        x,
-        2.4,
-        -1.68
-      );
-
-      cat.add(eye);
-    }
-
-    createEye(-0.3);
-    createEye(0.3);
-
-
-    // Nose
-
-    const noseGeometry =
-      new THREE.SphereGeometry(
-        0.1,
-        16,
-        16
-      );
-
-    const noseMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0xff8fab
-      });
-
-    const nose =
+    const bedBase =
       new THREE.Mesh(
-        noseGeometry,
-        noseMaterial
+        new THREE.BoxGeometry(
+          3,
+          0.5,
+          2.2
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0x6fa8dc
+        })
       );
 
-    nose.position.set(
-      0,
-      2.15,
-      -1.7
+
+    bedBase.position.set(
+      5,
+      0.3,
+      -5
     );
 
-    cat.add(nose);
+
+    bedBase.castShadow = true;
+
+    scene.add(
+      bedBase
+    );
 
 
-    // Tail
-
-    const tailGeometry =
-      new THREE.CylinderGeometry(
-        0.15,
-        0.2,
-        2.2,
-        16
-      );
-
-    const tail =
+    const bedPillow =
       new THREE.Mesh(
-        tailGeometry,
-        catMaterial
+        new THREE.BoxGeometry(
+          2.4,
+          0.3,
+          0.8
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0xf7d6e0
+        })
       );
 
-    tail.position.set(
-      0,
-      1.5,
-      1.2
+
+    bedPillow.position.set(
+      5,
+      0.7,
+      -5.55
     );
 
-    tail.rotation.x = Math.PI / 3;
 
-    tail.castShadow = true;
+    scene.add(
+      bedPillow
+    );
 
-    cat.add(tail);
 
-
-    // -------------------------
-    // FOOD BOWL
-    // -------------------------
-
-    const bowlGeometry =
-      new THREE.CylinderGeometry(
-        0.8,
-        0.6,
-        0.35,
-        32
-      );
-
-    const bowlMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0x6fa8dc
-      });
+    /* =========================================================
+       FOOD BOWL
+    ========================================================= */
 
     const bowl =
       new THREE.Mesh(
-        bowlGeometry,
-        bowlMaterial
+        new THREE.CylinderGeometry(
+          0.8,
+          0.6,
+          0.35,
+          32
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0x6fa8dc
+        })
       );
+
 
     bowl.position.set(
       -4,
@@ -554,32 +839,30 @@
       -3
     );
 
+
     bowl.castShadow = true;
 
-    scene.add(bowl);
+    scene.add(
+      bowl
+    );
 
 
-    // -------------------------
-    // TOY BALL
-    // -------------------------
-
-    const ballGeometry =
-      new THREE.SphereGeometry(
-        0.35,
-        24,
-        24
-      );
-
-    const ballMaterial =
-      new THREE.MeshStandardMaterial({
-        color: 0xff6688
-      });
+    /* =========================================================
+       TOY BALL
+    ========================================================= */
 
     const ball =
       new THREE.Mesh(
-        ballGeometry,
-        ballMaterial
+        new THREE.SphereGeometry(
+          0.35,
+          24,
+          24
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0xff6688
+        })
       );
+
 
     ball.position.set(
       4,
@@ -587,156 +870,1298 @@
       2
     );
 
+
     ball.castShadow = true;
 
-    scene.add(ball);
+    scene.add(
+      ball
+    );
 
 
-    // -------------------------
-    // CAT STATS
-    // -------------------------
+    /* =========================================================
+       PLAYER
+    ========================================================= */
 
-    let hunger = 80;
-    let happiness = 80;
-    let energy = 80;
+    const player =
+      new THREE.Group();
 
 
-    function updateStats() {
+    player.position.set(
+      0,
+      0,
+      5
+    );
 
-      document.getElementById("hunger").style.width =
-        hunger + "%";
 
-      document.getElementById("happiness").style.width =
-        happiness + "%";
+    scene.add(
+      player
+    );
 
-      document.getElementById("energy").style.width =
-        energy + "%";
+
+    const playerBody =
+      new THREE.Mesh(
+        new THREE.CapsuleGeometry(
+          0.45,
+          1,
+          8,
+          16
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0x5b8def
+        })
+      );
+
+
+    playerBody.position.y = 1;
+
+    playerBody.castShadow = true;
+
+    player.add(
+      playerBody
+    );
+
+
+    const playerHead =
+      new THREE.Mesh(
+        new THREE.SphereGeometry(
+          0.42,
+          20,
+          20
+        ),
+        new THREE.MeshStandardMaterial({
+          color: 0xffd0a6
+        })
+      );
+
+
+    playerHead.position.y = 1.95;
+
+    playerHead.castShadow = true;
+
+    player.add(
+      playerHead
+    );
+
+
+    /* =========================================================
+       CAT DATA
+    ========================================================= */
+
+    const catChoices = [
+
+      {
+        id: "ginger1",
+        emoji: "🧡",
+        colour: 0xf2a65a,
+        species: "Domestic cat",
+        breed: "Domestic Shorthair",
+        age: "8 months",
+        birthday: "14 February 2026",
+        personality: "Playful",
+        marking: "Small white patch on the chest"
+      },
+
+      {
+        id: "ginger2",
+        emoji: "🧡",
+        colour: 0xd97932,
+        species: "Domestic cat",
+        breed: "Domestic Shorthair",
+        age: "5 years",
+        birthday: "3 June 2021",
+        personality: "Calm",
+        marking: "Darker stripe across the forehead"
+      },
+
+      {
+        id: "tabby1",
+        emoji: "🐯",
+        colour: 0x9b7048,
+        species: "Domestic cat",
+        breed: "Domestic Shorthair",
+        age: "2 years",
+        birthday: "27 October 2024",
+        personality: "Curious",
+        marking: "White chin and front paws"
+      },
+
+      {
+        id: "black1",
+        emoji: "🖤",
+        colour: 0x252525,
+        species: "Domestic cat",
+        breed: "Bombay",
+        age: "1 year",
+        birthday: "9 January 2025",
+        personality: "Adventurous",
+        marking: "Tiny white speckle on the left ear"
+      },
+
+      {
+        id: "black2",
+        emoji: "🖤",
+        colour: 0x181818,
+        species: "Domestic cat",
+        breed: "Bombay",
+        age: "4 years",
+        birthday: "18 August 2022",
+        personality: "Gentle",
+        marking: "Small white patch under the chin"
+      },
+
+      {
+        id: "white1",
+        emoji: "🤍",
+        colour: 0xf5f5f5,
+        species: "Domestic cat",
+        breed: "Persian",
+        age: "3 years",
+        birthday: "5 March 2023",
+        personality: "Sleepy",
+        marking: "One slightly grey ear"
+      },
+
+      {
+        id: "grey1",
+        emoji: "🩶",
+        colour: 0x888888,
+        species: "Domestic cat",
+        breed: "British Shorthair",
+        age: "2 years",
+        birthday: "22 July 2024",
+        personality: "Friendly",
+        marking: "White toes on the back paws"
+      }
+
+    ];
+
+
+    /* =========================================================
+       PLAYER'S CATS
+    ========================================================= */
+
+    const myCats = [];
+
+
+    let selectedChoice = null;
+
+    let activeCatIndex = 0;
+
+
+    /* =========================================================
+       CAT CREATION
+    ========================================================= */
+
+    function createCatVisual(
+      data
+    ) {
+
+      const cat =
+        new THREE.Group();
+
+
+      cat.userData.catData =
+        data;
+
+
+      const material =
+        new THREE.MeshStandardMaterial({
+          color: data.colour
+        });
+
+
+      const body =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            1.05,
+            24,
+            18
+          ),
+          material
+        );
+
+
+      body.scale.set(
+        1,
+        0.85,
+        1.2
+      );
+
+
+      body.position.y =
+        1.1;
+
+
+      body.castShadow = true;
+
+      cat.add(
+        body
+      );
+
+
+      const head =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            0.78,
+            24,
+            18
+          ),
+          material
+        );
+
+
+      head.position.set(
+        0,
+        2.05,
+        -0.75
+      );
+
+
+      head.castShadow = true;
+
+      cat.add(
+        head
+      );
+
+
+      function ear(x) {
+
+        const e =
+          new THREE.Mesh(
+            new THREE.ConeGeometry(
+              0.3,
+              0.7,
+              4
+            ),
+            material
+          );
+
+
+        e.position.set(
+          x,
+          2.7,
+          -0.75
+        );
+
+
+        e.rotation.y =
+          Math.PI / 4;
+
+
+        e.castShadow = true;
+
+        cat.add(
+          e
+        );
+      }
+
+
+      ear(-0.45);
+      ear(0.45);
+
+
+      const eyeMaterial =
+        new THREE.MeshStandardMaterial({
+          color: 0x222222
+        });
+
+
+      function eye(x) {
+
+        const e =
+          new THREE.Mesh(
+            new THREE.SphereGeometry(
+              0.1,
+              12,
+              12
+            ),
+            eyeMaterial
+          );
+
+
+        e.position.set(
+          x,
+          2.1,
+          -1.42
+        );
+
+
+        cat.add(
+          e
+        );
+      }
+
+
+      eye(-0.25);
+      eye(0.25);
+
+
+      const nose =
+        new THREE.Mesh(
+          new THREE.SphereGeometry(
+            0.08,
+            12,
+            12
+          ),
+          new THREE.MeshStandardMaterial({
+            color: 0xff8fab
+          })
+        );
+
+
+      nose.position.set(
+        0,
+        1.9,
+        -1.45
+      );
+
+
+      cat.add(
+        nose
+      );
+
+
+      const tail =
+        new THREE.Mesh(
+          new THREE.CylinderGeometry(
+            0.13,
+            0.18,
+            1.8,
+            16
+          ),
+          material
+        );
+
+
+      tail.position.set(
+        0,
+        1.4,
+        1.2
+      );
+
+
+      tail.rotation.x =
+        Math.PI / 3;
+
+
+      tail.castShadow = true;
+
+      cat.add(
+        tail
+      );
+
+
+      cat.userData.body =
+        body;
+
+      cat.userData.tail =
+        tail;
+
+
+      return cat;
     }
 
-    updateStats();
+
+    /* =========================================================
+       CREATE ADOPTION CARDS
+    ========================================================= */
+
+    const catsList =
+      document.getElementById(
+        "catsList"
+      );
 
 
-    // -------------------------
-    // MESSAGE
-    // -------------------------
+    function buildAdoptionList() {
 
-    function showMessage(text) {
+      catsList.innerHTML = "";
+
+
+      catChoices.forEach(
+        (choice, index) => {
+
+          const alreadyOwned =
+            myCats.some(
+              cat =>
+                cat.choiceId === choice.id
+            );
+
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "catCard";
+
+
+          if (alreadyOwned) {
+            card.style.opacity =
+              "0.5";
+          }
+
+
+          card.innerHTML = `
+
+            <div class="catEmoji">
+              ${choice.emoji}
+            </div>
+
+            <h3>${choice.breed}</h3>
+
+            <p>
+              ${choice.age}
+            </p>
+
+            <p>
+              ${choice.personality}
+            </p>
+
+            ${
+              alreadyOwned
+              ? "<p>Already adopted</p>"
+              : "<p>Tap to meet this cat</p>"
+            }
+
+          `;
+
+
+          if (!alreadyOwned) {
+
+            card.addEventListener(
+              "click",
+              () => {
+
+                document
+                  .querySelectorAll(
+                    ".catCard"
+                  )
+                  .forEach(
+                    c =>
+                      c.classList.remove(
+                        "selected"
+                      )
+                  );
+
+
+                card.classList.add(
+                  "selected"
+                );
+
+
+                showCatDetails(
+                  choice
+                );
+
+              }
+            );
+
+          }
+
+
+          catsList.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+    function showCatDetails(
+      choice
+    ) {
+
+      selectedChoice =
+        choice;
+
+
+      document
+        .getElementById(
+          "catDetails"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "selectedCatEmoji"
+        )
+        .textContent =
+        choice.emoji;
+
+
+      document
+        .getElementById(
+          "selectedCatName"
+        )
+        .textContent =
+        choice.breed;
+
+
+      document
+        .getElementById(
+          "selectedSpecies"
+        )
+        .textContent =
+        choice.species;
+
+
+      document
+        .getElementById(
+          "selectedBreed"
+        )
+        .textContent =
+        choice.breed;
+
+
+      document
+        .getElementById(
+          "selectedAge"
+        )
+        .textContent =
+        choice.age;
+
+
+      document
+        .getElementById(
+          "selectedBirthday"
+        )
+        .textContent =
+        choice.birthday;
+
+
+      document
+        .getElementById(
+          "selectedPersonality"
+        )
+        .textContent =
+        choice.personality;
+
+
+      document
+        .getElementById(
+          "selectedMarking"
+        )
+        .textContent =
+        choice.marking;
+
+
+      document
+        .getElementById(
+          "nameInput"
+        )
+        .value = "";
+
+    }
+
+
+    /* =========================================================
+       ADOPT CAT
+    ========================================================= */
+
+    document
+      .getElementById(
+        "adoptButton"
+      )
+      .onclick = () => {
+
+        if (!selectedChoice) {
+
+          showMessage(
+            "Choose a cat first!"
+          );
+
+          return;
+        }
+
+
+        if (myCats.length >= 5) {
+
+          showMessage(
+            "Your home already has 5 cats!"
+          );
+
+          return;
+        }
+
+
+        let name =
+          document
+            .getElementById(
+              "nameInput"
+            )
+            .value
+            .trim();
+
+
+        if (!name) {
+          name = "Mittens";
+        }
+
+
+        const newCatData = {
+
+          ...selectedChoice,
+
+          choiceId:
+            selectedChoice.id,
+
+          name: name,
+
+          hunger: 80,
+
+          happiness: 80,
+
+          energy: 80,
+
+          trickProgress: {
+
+            sit: 0,
+            stay: 0,
+            come: 0,
+            paw: 0,
+            spin: 0
+
+          }
+
+        };
+
+
+        const catObject =
+          createCatVisual(
+            newCatData
+          );
+
+
+        catObject.position.set(
+          Math.random() * 8 - 4,
+          0,
+          Math.random() * 6 - 2
+        );
+
+
+        catObject.userData.targetX =
+          catObject.position.x;
+
+
+        catObject.userData.targetZ =
+          catObject.position.z;
+
+
+        catObject.userData.wanderTimer =
+          0;
+
+
+        scene.add(
+          catObject
+        );
+
+
+        newCatData.object =
+          catObject;
+
+
+        myCats.push(
+          newCatData
+        );
+
+
+        activeCatIndex =
+          myCats.length - 1;
+
+
+        selectedChoice = null;
+
+
+        showMessage(
+          name +
+          " has joined your family! 🐾"
+        );
+
+
+        updateHUD();
+
+
+        setTimeout(
+          () => {
+
+            closeAdoptionScreen();
+
+          },
+          900
+        );
+
+      };
+
+
+    /* =========================================================
+       OPEN/CLOSE ADOPTION
+    ========================================================= */
+
+    function openAdoptionScreen() {
+
+      buildAdoptionList();
+
+
+      document
+        .getElementById(
+          "adoptionScreen"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "hud"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "topMenu"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "actions"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "controls"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "catDetails"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+    }
+
+
+    function closeAdoptionScreen() {
+
+      document
+        .getElementById(
+          "adoptionScreen"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      showHomeInterface();
+
+    }
+
+
+    document
+      .getElementById(
+        "adoptionButton"
+      )
+      .onclick =
+      openAdoptionScreen;
+
+
+    document
+      .getElementById(
+        "backFromAdoption"
+      )
+      .onclick =
+      closeAdoptionScreen;
+
+
+    /* =========================================================
+       HOME INTERFACE
+    ========================================================= */
+
+    function showHomeInterface() {
+
+      document
+        .getElementById(
+          "hud"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "topMenu"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "actions"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "controls"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      updateHUD();
+
+    }
+
+
+    /* =========================================================
+       HUD
+    ========================================================= */
+
+    function updateHUD() {
+
+      if (
+        myCats.length === 0
+      ) {
+
+        document
+          .getElementById(
+            "hudCatName"
+          )
+          .textContent =
+          "🐱 No cat yet";
+
+        return;
+
+      }
+
+
+      const cat =
+        myCats[
+          activeCatIndex
+        ];
+
+
+      document
+        .getElementById(
+          "hudCatName"
+        )
+        .textContent =
+        "🐱 " + cat.name;
+
+
+      document
+        .getElementById(
+          "hunger"
+        )
+        .style.width =
+        cat.hunger + "%";
+
+
+      document
+        .getElementById(
+          "happiness"
+        )
+        .style.width =
+        cat.happiness + "%";
+
+
+      document
+        .getElementById(
+          "energy"
+        )
+        .style.width =
+        cat.energy + "%";
+
+
+      document
+        .getElementById(
+          "homeCats"
+        )
+        .textContent =
+        "Cats at home: " +
+        myCats.length +
+        " / 5";
+
+    }
+
+
+    /* =========================================================
+       MESSAGE
+    ========================================================= */
+
+    function showMessage(
+      text
+    ) {
 
       const message =
-        document.getElementById("message");
+        document.getElementById(
+          "message"
+        );
 
-      message.textContent = text;
-      message.style.display = "block";
 
-      setTimeout(() => {
-        message.style.display = "none";
-      }, 1500);
+      message.textContent =
+        text;
+
+
+      message.style.display =
+        "block";
+
+
+      clearTimeout(
+        message.hideTimer
+      );
+
+
+      message.hideTimer =
+        setTimeout(
+          () => {
+
+            message.style.display =
+              "none";
+
+          },
+          1700
+        );
+
     }
 
 
-    // -------------------------
-    // BUTTONS
-    // -------------------------
+    /* =========================================================
+       FEED
+    ========================================================= */
 
-    document.getElementById("feed").onclick =
-      function () {
+    document
+      .getElementById(
+        "feed"
+      )
+      .onclick = () => {
 
-        hunger = Math.min(
-          100,
-          hunger + 20
+        if (
+          myCats.length === 0
+        ) {
+
+          showMessage(
+            "Adopt a cat first!"
+          );
+
+          return;
+
+        }
+
+
+        const cat =
+          myCats[
+            activeCatIndex
+          ];
+
+
+        cat.hunger =
+          Math.min(
+            100,
+            cat.hunger + 20
+          );
+
+
+        cat.happiness =
+          Math.min(
+            100,
+            cat.happiness + 5
+          );
+
+
+        updateHUD();
+
+
+        showMessage(
+          cat.name +
+          " enjoyed the food! 🍗"
         );
 
-        happiness = Math.min(
-          100,
-          happiness + 5
-        );
-
-        updateStats();
-
-        showMessage("😺 Yum! Thank you!");
       };
 
 
-    document.getElementById("play").onclick =
-      function () {
+    /* =========================================================
+       PLAY
+    ========================================================= */
 
-        happiness = Math.min(
-          100,
-          happiness + 20
+    document
+      .getElementById(
+        "play"
+      )
+      .onclick = () => {
+
+        if (
+          myCats.length === 0
+        ) {
+
+          showMessage(
+            "Adopt a cat first!"
+          );
+
+          return;
+
+        }
+
+
+        const cat =
+          myCats[
+            activeCatIndex
+          ];
+
+
+        cat.happiness =
+          Math.min(
+            100,
+            cat.happiness + 20
+          );
+
+
+        cat.energy =
+          Math.max(
+            0,
+            cat.energy - 10
+          );
+
+
+        updateHUD();
+
+
+        showMessage(
+          cat.name +
+          " is having fun! 🧶"
         );
 
-        energy = Math.max(
+      };
+
+
+    /* =========================================================
+       PET
+    ========================================================= */
+
+    document
+      .getElementById(
+        "pet"
+      )
+      .onclick = () => {
+
+        if (
+          myCats.length === 0
+        ) {
+
+          showMessage(
+            "Adopt a cat first!"
+          );
+
+          return;
+
+        }
+
+
+        const cat =
+          myCats[
+            activeCatIndex
+          ];
+
+
+        cat.happiness =
+          Math.min(
+            100,
+            cat.happiness + 15
+          );
+
+
+        updateHUD();
+
+
+        showMessage(
+          cat.name +
+          " is purring! ❤️"
+        );
+
+      };
+
+
+    /* =========================================================
+       SLEEP
+    ========================================================= */
+
+    document
+      .getElementById(
+        "sleep"
+      )
+      .onclick = () => {
+
+        if (
+          myCats.length === 0
+        ) {
+
+          showMessage(
+            "Adopt a cat first!"
+          );
+
+          return;
+
+        }
+
+
+        const cat =
+          myCats[
+            activeCatIndex
+          ];
+
+
+        cat.energy =
+          Math.min(
+            100,
+            cat.energy + 35
+          );
+
+
+        cat.happiness =
+          Math.min(
+            100,
+            cat.happiness + 5
+          );
+
+
+        cat.object.position.set(
+          5,
           0,
-          energy - 10
+          -5
         );
 
-        updateStats();
 
-        showMessage("🐱 The cat is playing!");
+        updateHUD();
+
+
+        showMessage(
+          cat.name +
+          " had a nice nap! 💤"
+        );
+
       };
 
 
-    document.getElementById("pet").onclick =
-      function () {
-
-        happiness = Math.min(
-          100,
-          happiness + 15
-        );
-
-        updateStats();
-
-        showMessage("❤️ Purr...");
-      };
-
-
-    // -------------------------
-    // MOVEMENT
-    // -------------------------
+    /* =========================================================
+       MOVEMENT
+    ========================================================= */
 
     const movement = {
+
       forward: false,
       backward: false,
       left: false,
       right: false
+
     };
 
 
-    function moveCat() {
+    function movePlayer() {
 
-      const speed = 0.08;
+      const speed =
+        0.09;
 
-      if (movement.forward) {
-        cat.position.z -= speed;
+
+      let dx = 0;
+      let dz = 0;
+
+
+      if (
+        movement.forward
+      ) {
+        dz -= speed;
       }
 
-      if (movement.backward) {
-        cat.position.z += speed;
+
+      if (
+        movement.backward
+      ) {
+        dz += speed;
       }
 
-      if (movement.left) {
-        cat.position.x -= speed;
+
+      if (
+        movement.left
+      ) {
+        dx -= speed;
       }
 
-      if (movement.right) {
-        cat.position.x += speed;
+
+      if (
+        movement.right
+      ) {
+        dx += speed;
       }
 
-      // Keep cat inside room
 
-      cat.position.x =
+      if (
+        dx !== 0 ||
+        dz !== 0
+      ) {
+
+        player.position.x += dx;
+        player.position.z += dz;
+
+
+        const angle =
+          Math.atan2(
+            dx,
+            dz
+          );
+
+
+        player.rotation.y =
+          angle;
+
+      }
+
+
+      player.position.x =
         THREE.MathUtils.clamp(
-          cat.position.x,
+          player.position.x,
           -8,
           8
         );
 
-      cat.position.z =
+
+      player.position.z =
         THREE.MathUtils.clamp(
-          cat.position.z,
+          player.position.z,
           -8,
           8
         );
+
     }
 
 
@@ -746,28 +2171,56 @@
     ) {
 
       const button =
-        document.getElementById(id);
+        document.getElementById(
+          id
+        );
+
 
       button.addEventListener(
         "pointerdown",
-        () => {
-          movement[direction] = true;
+        event => {
+
+          event.preventDefault();
+
+          movement[direction] =
+            true;
+
         }
       );
+
 
       button.addEventListener(
         "pointerup",
         () => {
-          movement[direction] = false;
+
+          movement[direction] =
+            false;
+
         }
       );
+
+
+      button.addEventListener(
+        "pointercancel",
+        () => {
+
+          movement[direction] =
+            false;
+
+        }
+      );
+
 
       button.addEventListener(
         "pointerleave",
         () => {
-          movement[direction] = false;
+
+          movement[direction] =
+            false;
+
         }
       );
+
     }
 
 
@@ -776,15 +2229,18 @@
       "forward"
     );
 
+
     setupMovementButton(
       "down",
       "backward"
     );
 
+
     setupMovementButton(
       "left",
       "left"
     );
+
 
     setupMovementButton(
       "right",
@@ -792,86 +2248,631 @@
     );
 
 
-    // -------------------------
-    // KEYBOARD CONTROLS
-    // -------------------------
+    /* =========================================================
+       KEYBOARD
+    ========================================================= */
 
     window.addEventListener(
       "keydown",
-      (event) => {
+      event => {
+
+        const key =
+          event.key.toLowerCase();
+
 
         if (
-          event.key === "ArrowUp" ||
-          event.key.toLowerCase() === "w"
+          key === "arrowup" ||
+          key === "w"
         ) {
-          movement.forward = true;
+          movement.forward =
+            true;
         }
 
-        if (
-          event.key === "ArrowDown" ||
-          event.key.toLowerCase() === "s"
-        ) {
-          movement.backward = true;
-        }
 
         if (
-          event.key === "ArrowLeft" ||
-          event.key.toLowerCase() === "a"
+          key === "arrowdown" ||
+          key === "s"
         ) {
-          movement.left = true;
+          movement.backward =
+            true;
         }
 
+
         if (
-          event.key === "ArrowRight" ||
-          event.key.toLowerCase() === "d"
+          key === "arrowleft" ||
+          key === "a"
         ) {
-          movement.right = true;
+          movement.left =
+            true;
         }
+
+
+        if (
+          key === "arrowright" ||
+          key === "d"
+        ) {
+          movement.right =
+            true;
+        }
+
       }
     );
 
 
     window.addEventListener(
       "keyup",
-      (event) => {
+      event => {
+
+        const key =
+          event.key.toLowerCase();
+
 
         if (
-          event.key === "ArrowUp" ||
-          event.key.toLowerCase() === "w"
+          key === "arrowup" ||
+          key === "w"
         ) {
-          movement.forward = false;
+          movement.forward =
+            false;
         }
 
-        if (
-          event.key === "ArrowDown" ||
-          event.key.toLowerCase() === "s"
-        ) {
-          movement.backward = false;
-        }
 
         if (
-          event.key === "ArrowLeft" ||
-          event.key.toLowerCase() === "a"
+          key === "arrowdown" ||
+          key === "s"
         ) {
-          movement.left = false;
+          movement.backward =
+            false;
         }
 
+
         if (
-          event.key === "ArrowRight" ||
-          event.key.toLowerCase() === "d"
+          key === "arrowleft" ||
+          key === "a"
         ) {
-          movement.right = false;
+          movement.left =
+            false;
         }
+
+
+        if (
+          key === "arrowright" ||
+          key === "d"
+        ) {
+          movement.right =
+            false;
+        }
+
       }
     );
 
 
-    // -------------------------
-    // ANIMATION
-    // -------------------------
+    /* =========================================================
+       CAT WANDERING
+    ========================================================= */
+
+    function updateCats(
+      delta,
+      time
+    ) {
+
+      myCats.forEach(
+        catData => {
+
+          const cat =
+            catData.object;
+
+
+          cat.userData.wanderTimer -=
+            delta;
+
+
+          if (
+            cat.userData.wanderTimer <= 0
+          ) {
+
+            cat.userData.targetX =
+              THREE.MathUtils.clamp(
+                cat.position.x +
+                (Math.random() * 6 - 3),
+                -7,
+                7
+              );
+
+
+            cat.userData.targetZ =
+              THREE.MathUtils.clamp(
+                cat.position.z +
+                (Math.random() * 6 - 3),
+                -7,
+                7
+              );
+
+
+            cat.userData.wanderTimer =
+              2 +
+              Math.random() * 4;
+
+          }
+
+
+          const dx =
+            cat.userData.targetX -
+            cat.position.x;
+
+
+          const dz =
+            cat.userData.targetZ -
+            cat.position.z;
+
+
+          const distance =
+            Math.sqrt(
+              dx * dx +
+              dz * dz
+            );
+
+
+          if (
+            distance > 0.15 &&
+            catData.energy > 5
+          ) {
+
+            const speed =
+              0.025;
+
+
+            cat.position.x +=
+              (dx / distance) *
+              speed;
+
+
+            cat.position.z +=
+              (dz / distance) *
+              speed;
+
+
+            /*
+              This makes the whole cat
+              turn towards where it is walking.
+            */
+
+            cat.rotation.y =
+              Math.atan2(
+                dx,
+                dz
+              );
+
+          }
+
+
+          if (
+            cat.userData.body
+          ) {
+
+            cat.userData.body.scale.y =
+              0.85 +
+              Math.sin(
+                time * 3 +
+                cat.position.x
+              ) *
+              0.025;
+
+          }
+
+
+          if (
+            cat.userData.tail
+          ) {
+
+            cat.userData.tail.rotation.z =
+              Math.sin(
+                time * 3
+              ) *
+              0.15;
+
+          }
+
+        }
+      );
+
+    }
+
+
+    /* =========================================================
+       NEEDS DECREASE OVER TIME
+    ========================================================= */
+
+    let needsTimer = 0;
+
+
+    function updateNeeds(
+      delta
+    ) {
+
+      needsTimer +=
+        delta;
+
+
+      if (
+        needsTimer < 5
+      ) {
+        return;
+      }
+
+
+      needsTimer = 0;
+
+
+      myCats.forEach(
+        cat => {
+
+          cat.hunger =
+            Math.max(
+              0,
+              cat.hunger - 1
+            );
+
+
+          cat.happiness =
+            Math.max(
+              0,
+              cat.happiness - 0.7
+            );
+
+
+          cat.energy =
+            Math.max(
+              0,
+              cat.energy - 0.5
+            );
+
+        }
+      );
+
+
+      updateHUD();
+
+    }
+
+
+    /* =========================================================
+       TRAINING
+    ========================================================= */
+
+    const tricks = [
+
+      {
+        id: "sit",
+        emoji: "🪑",
+        name: "Sit"
+      },
+
+      {
+        id: "stay",
+        emoji: "🛑",
+        name: "Stay"
+      },
+
+      {
+        id: "come",
+        emoji: "🐾",
+        name: "Come"
+      },
+
+      {
+        id: "paw",
+        emoji: "🐾",
+        name: "Paw"
+      },
+
+      {
+        id: "spin",
+        emoji: "🔄",
+        name: "Spin"
+      }
+
+    ];
+
+
+    function openTraining() {
+
+      if (
+        myCats.length === 0
+      ) {
+
+        showMessage(
+          "Adopt a cat before training!"
+        );
+
+        return;
+
+      }
+
+
+      document
+        .getElementById(
+          "trainingScreen"
+        )
+        .classList.remove(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "hud"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "topMenu"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "actions"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      document
+        .getElementById(
+          "controls"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+
+      const cat =
+        myCats[
+          activeCatIndex
+        ];
+
+
+      document
+        .getElementById(
+          "trainingCatName"
+        )
+        .textContent =
+        "Training " +
+        cat.name +
+        " 🐱";
+
+
+      buildTrainingList();
+
+    }
+
+
+    function buildTrainingList() {
+
+      const list =
+        document.getElementById(
+          "trainingList"
+        );
+
+
+      list.innerHTML = "";
+
+
+      const cat =
+        myCats[
+          activeCatIndex
+        ];
+
+
+      tricks.forEach(
+        trick => {
+
+          const progress =
+            cat.trickProgress[
+              trick.id
+            ];
+
+
+          const learned =
+            progress >= 100;
+
+
+          const card =
+            document.createElement(
+              "div"
+            );
+
+
+          card.className =
+            "trainingCard";
+
+
+          card.innerHTML = `
+
+            <div style="font-size:40px">
+              ${trick.emoji}
+            </div>
+
+            <h3>
+              ${trick.name}
+            </h3>
+
+            <div class="trainingProgress">
+              <div
+                style="width:${progress}%"
+              ></div>
+            </div>
+
+            <p>
+              ${
+                learned
+                ? "✅ Learned!"
+                : progress + "% learned"
+              }
+            </p>
+
+            <button
+              class="greenButton"
+              ${
+                learned
+                ? "disabled"
+                : ""
+              }
+            >
+              ${
+                learned
+                ? "Learned"
+                : "Train"
+              }
+            </button>
+
+          `;
+
+
+          const button =
+            card.querySelector(
+              "button"
+            );
+
+
+          if (!learned) {
+
+            button.onclick =
+              () => {
+
+                cat.trickProgress[
+                  trick.id
+                ] =
+                  Math.min(
+                    100,
+                    cat.trickProgress[
+                      trick.id
+                    ] + 20
+                  );
+
+
+                cat.energy =
+                  Math.max(
+                    0,
+                    cat.energy - 5
+                  );
+
+
+                cat.happiness =
+                  Math.min(
+                    100,
+                    cat.happiness + 3
+                  );
+
+
+                buildTrainingList();
+
+
+                showMessage(
+                  cat.name +
+                  " practiced " +
+                  trick.name +
+                  "! 🐾"
+                );
+
+              };
+
+          }
+
+
+          list.appendChild(
+            card
+          );
+
+        }
+      );
+
+    }
+
+
+    document
+      .getElementById(
+        "trainingButton"
+      )
+      .onclick =
+      openTraining;
+
+
+    document
+      .getElementById(
+        "trainingBack"
+      )
+      .onclick = () => {
+
+        document
+          .getElementById(
+            "trainingScreen"
+          )
+          .classList.add(
+            "hidden"
+          );
+
+
+        showHomeInterface();
+
+      };
+
+
+    /* =========================================================
+       CAMERA
+    ========================================================= */
+
+    function updateCamera() {
+
+      const targetX =
+        player.position.x;
+
+
+      const targetZ =
+        player.position.z +
+        11;
+
+
+      camera.position.x +=
+        (
+          targetX -
+          camera.position.x
+        ) *
+        0.05;
+
+
+      camera.position.z +=
+        (
+          targetZ -
+          camera.position.z
+        ) *
+        0.05;
+
+
+      camera.lookAt(
+        player.position.x,
+        1,
+        player.position.z
+      );
+
+    }
+
+
+    /* =========================================================
+       GAME LOOP
+    ========================================================= */
 
     const clock =
       new THREE.Clock();
+
 
     function animate() {
 
@@ -879,61 +2880,46 @@
         animate
       );
 
+
+      const delta =
+        clock.getDelta();
+
+
       const time =
         clock.getElapsedTime();
 
-      // Little breathing animation
 
-      body.scale.y =
-        0.85 +
-        Math.sin(time * 3) * 0.02;
+      movePlayer();
 
 
-      // Tail wiggle
-
-      tail.rotation.z =
-        Math.sin(time * 3) * 0.15;
-
-
-      moveCat();
-
-
-      // Camera follows the cat
-
-      const targetCameraX =
-        cat.position.x;
-
-      const targetCameraZ =
-        cat.position.z + 11;
-
-      camera.position.x +=
-        (targetCameraX -
-          camera.position.x) * 0.04;
-
-      camera.position.z +=
-        (targetCameraZ -
-          camera.position.z) * 0.04;
-
-      camera.lookAt(
-        cat.position.x,
-        1,
-        cat.position.z
+      updateCats(
+        delta,
+        time
       );
+
+
+      updateNeeds(
+        delta
+      );
+
+
+      updateCamera();
 
 
       renderer.render(
         scene,
         camera
       );
+
     }
 
 
     animate();
 
 
-    // -------------------------
-    // RESIZE
-    // -------------------------
+    /* =========================================================
+       WINDOW RESIZE
+    ========================================================= */
 
     window.addEventListener(
       "resize",
@@ -943,14 +2929,30 @@
           window.innerWidth /
           window.innerHeight;
 
+
         camera.updateProjectionMatrix();
+
 
         renderer.setSize(
           window.innerWidth,
           window.innerHeight
         );
+
       }
     );
+
+
+    /* =========================================================
+       START GAME
+    ========================================================= */
+
+    buildAdoptionList();
+
+
+    /*
+      The game starts at the Adoption Centre.
+      After choosing a cat, the player enters the home.
+    */
 
   </script>
 
